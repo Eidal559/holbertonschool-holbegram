@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:holbegram/screens/login_screen.dart';
+// ignore: unused_import
+import 'firebase_options.dart'; // <-- This is the important part
+import 'screens/login_screen.dart';
 
-Future<void> main() async {
+// ignore: non_constant_identifier_names
+Future<void> main(dynamic DefaultFirebaseOptions) async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -20,7 +25,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const LoginScreen(), // Start with the LoginScreen
+      home: const LoginScreen(),
     );
   }
 }
