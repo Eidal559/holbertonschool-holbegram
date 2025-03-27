@@ -5,7 +5,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 class FavoritePage extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  const FavoritePage({super.key});
+  FavoritePage({super.key});
 
   @override
   Widget build(BuildContext context) {
