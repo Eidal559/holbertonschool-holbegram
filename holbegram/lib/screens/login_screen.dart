@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:holbegram/widgets/text_field.dart'; // Import the TextFieldInput widget
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
-import 'signup_screen.dart'; // Import SignUpScreen
+import 'package:holbegram/widgets/text_field.dart';
+import 'signup_screen.dart';
+import 'package:holbegram/methods/auth_methods.dart';
+import 'package:holbegram/screens/home.dart';
 
+
+// Classe pour l'écran de connexion
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key}); // Use super parameters
+  const LoginScreen({super.key});
 
+  // Crée l'état associé au widget LoginScreen
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
+// Classe State associée au widget LoginScreen
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool _passwordVisible = true;
-  final FirebaseAuth _auth = FirebaseAuth.instance; // Initialize Firebase Auth
 
-  @override
-  void initState() {
-    super.initState();
-    _passwordVisible = true; // Password is initially visible
-  }
-
+  // Méthode pour libérer les ressources utilisées par le contrôleur de texte
   @override
   void dispose() {
     emailController.dispose();
@@ -29,66 +28,88 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  Future<void> login() async {
-    // Implement your login logic here
-    String email = emailController.text;
-    String password = passwordController.text;
+  // Méthode pour initialiser l'état du widget
+  @override
+  void initState() {
+    super.initState();
+    _passwordVisible = true;
+  }
 
-    try {
-      await _auth.signInWithEmailAndPassword(email: email, password: password);
-      if (!mounted) return; // Check if the widget is still mounted
+  // Méthode pour gérer la soumission du formulaire de connexion
+  void loginUser() async {
+    String res = await AuthMethods().login(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+
+     // Vérifie si le widget est toujours monté
+    if (!mounted) return;
+
+    if (res == 'success') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login successful')),
       );
-      // Navigate to the next screen or perform any other action
-    } catch (e) {
-      if (!mounted) return; // Check if the widget is still mounted
+      // Naviguer vers la page d'accueil
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Home()),
+      );
+      // Redirige l'utilisateur vers l'écran d'accueil
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
+        SnackBar(content: Text(res)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add horizontal padding
+        child: Container(
+          height: screenHeight,
+          width: screenWidth,
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.07),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 28),
-              const Text(
+            children: <Widget>[
+              SizedBox(height: screenHeight * 0.01),
+
+              // Affiche le titre et le logo de l'application
+              Text(
                 'Holbegram',
                 style: TextStyle(
                   fontFamily: 'Billabong',
-                  fontSize: 50,
+                  fontSize: screenHeight * 0.08,
                 ),
               ),
               Image.asset(
-                'assets/images/logo.png', // Replace with your logo file path
-                width: 80,
-                height: 60,
+                'assets/images/logo.png',
+                width: screenWidth * 0.2,
+                height: screenHeight * 0.08,
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: screenHeight * 0.05),
+
+              // Affiche les champs de saisie pour l'email et le mot de passe
               TextFieldInput(
                 controller: emailController,
-                isPassword: false,
                 hintText: 'Email',
                 keyboardType: TextInputType.emailAddress,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: screenHeight * 0.03),
               TextFieldInput(
                 controller: passwordController,
                 isPassword: !_passwordVisible,
                 hintText: 'Password',
                 keyboardType: TextInputType.visiblePassword,
                 suffixIcon: IconButton(
-                  alignment: Alignment.bottomLeft,
                   icon: Icon(
                     _passwordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: const Color.fromARGB(218, 226, 37, 24),
                   ),
                   onPressed: () {
                     setState(() {
@@ -97,43 +118,63 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
               ),
-              const SizedBox(height: 28),
+              SizedBox(height: screenHeight * 0.04),
+
+              // Affiche le bouton de connexion
               SizedBox(
-                height: 48,
+                height: screenHeight * 0.06,
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStateProperty.all( // Use WidgetStateProperty instead
-                      const Color.fromARGB(218, 226, 37, 24),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(218, 226, 37, 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                      side: const BorderSide(color: Colors.transparent),
                     ),
                   ),
-                  onPressed: login, // Call the login function here
-                  child: const Text(
-                    'Log in',
-                    style: TextStyle(color: Colors.white),
+                  onPressed: loginUser,
+                  child: Text(
+                    'Log In',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: screenHeight * 0.020,
+                      fontWeight: FontWeight.bold
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
-              const Row(
+              SizedBox(height: screenHeight * 0.04),
+
+              // Affiche le texte pour réinitialiser le mot de passe
+              Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Forgot your login details?'),
-                  SizedBox(width: 4),
                   Text(
-                    'Get help logging in',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    'Forgot your login details? ',
+                    style: TextStyle(fontSize: screenHeight * 0.017),
+                  ),
+                  Text(
+                    'Get help signing in.',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenHeight * 0.017,
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: screenHeight * 0.04),
               const Divider(thickness: 2),
+
+              // Affiche le texte pour créer un compte
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.02),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?"),
+                    Text(
+                      "Don't have an account",
+                      style: TextStyle(fontSize: screenHeight * 0.017),
+                    ),
                     TextButton(
                       onPressed: () {
                         Navigator.push(
@@ -141,46 +182,53 @@ class _LoginScreenState extends State<LoginScreen> {
                           MaterialPageRoute(builder: (context) => const SignUpScreen()),
                         );
                       },
-                      child: const Text(
+
+                      // Affiche le bouton pour s'inscrire
+                      child: Text(
                         'Sign up',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(218, 226, 37, 24),
+                          color: const Color.fromARGB(218, 226, 37, 24),
+                          fontSize: screenHeight * 0.017,
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 10),
-              const Row(
+              SizedBox(height: screenHeight * 0.01),
+
+              // Affiche le texte OR
+              Row(
                 children: [
-                  Flexible(
-                    flex: 1,
+                  const Flexible(
                     child: Divider(thickness: 2),
                   ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8),
-                    child: Text('OR'),
+                  Text(
+                    ' OR ',
+                    style: TextStyle(fontSize: screenHeight * 0.017),
                   ),
-                  Flexible(
-                    flex: 1,
+                  const Flexible(
                     child: Divider(thickness: 2),
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: screenHeight * 0.03),
+
+              // Affiche le bouton pour se connecter avec Google
               Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    'assets/images/google.png',
-                    width: 40,
-                    height: 40,
+                  Image.network(
+                    'https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-webinar-optimizing-for-success-google-business-webinar-13.png',
+                    width: screenWidth * 0.1,
+                    height: screenHeight * 0.05,
                   ),
-                  const SizedBox(width: 8),
-                  const Text('Sign in with Google'),
+                  Text(
+                    'Sign in with Google',
+                    style: TextStyle(fontSize: screenHeight * 0.017),
+                  ),
                 ],
               ),
             ],

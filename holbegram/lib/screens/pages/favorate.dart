@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class FavoritePage extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-   FavoritePage({super.key});
+  const FavoritePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,14 +57,4 @@ class FavoritePage extends StatelessWidget {
       ),
     );
   }
-}
-
-class StaggeredTile {
-  static Widget count(int i, int j) {
-    return Container(); // Return an empty container or any other widget
-  }
-}
-
-class StaggeredGridView {
-  static countBuilder({required int crossAxisCount, required int itemCount, required ClipRRect Function(dynamic context, dynamic index) itemBuilder, required Function(dynamic index) staggeredTileBuilder, required double mainAxisSpacing, required double crossAxisSpacing}) {}
 }

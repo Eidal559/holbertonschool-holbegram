@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Classe pour représenter un utilisateur
 class Users {
   final String uid;
   final String email;
@@ -12,6 +13,7 @@ class Users {
   final List<dynamic> saved;
   final String searchKey;
 
+  // Constructeur de la classe Users
   Users({
     required this.uid,
     required this.email,
@@ -25,25 +27,7 @@ class Users {
     required this.searchKey,
   });
 
-  // Factory method to create a User instance from a DocumentSnapshot
-  static Users fromSnap(DocumentSnapshot snap) {
-    var snapshot = snap.data() as Map<String, dynamic>;
-
-    return Users(
-      uid: snapshot['uid'],
-      email: snapshot['email'],
-      username: snapshot['username'],
-      bio: snapshot['bio'],
-      photoUrl: snapshot['photoUrl'],
-      followers: List<dynamic>.from(snapshot['followers']),
-      following: List<dynamic>.from(snapshot['following']),
-      posts: List<dynamic>.from(snapshot['posts']),
-      saved: List<dynamic>.from(snapshot['saved']),
-      searchKey: snapshot['searchKey'],
-    );
-  }
-
-  // Method to convert User instance to JSON
+  // Méthode pour convertir une instance de Users en une représentation Map
   Map<String, dynamic> toJson() {
     return {
       'uid': uid,
@@ -57,5 +41,28 @@ class Users {
       'saved': saved,
       'searchKey': searchKey,
     };
+  }
+
+  // Méthode pour créer une instance de Users à partir d'un DocumentSnapshot
+  static Users fromSnap(DocumentSnapshot snap) {
+    var snapshot = snap.data() as Map<String, dynamic>?;
+
+    // Vérifier si le DocumentSnapshot contient des données
+    if (snapshot == null) {
+      throw const FormatException("Invalid snapshot data");
+    }
+
+    return Users(
+      uid: snapshot['uid'] ?? '',
+      email: snapshot['email'] ?? '',
+      username: snapshot['username'] ?? '',
+      bio: snapshot['bio'] ?? '',
+      photoUrl: snapshot['photoUrl'] ?? '',
+      followers: snapshot['followers'] ?? [],
+      following: snapshot['following'] ?? [],
+      posts: snapshot['posts'] ?? [],
+      saved: snapshot['saved'] ?? [],
+      searchKey: snapshot['searchKey'] ?? '',
+    );
   }
 }
